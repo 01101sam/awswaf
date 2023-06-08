@@ -1,0 +1,13 @@
+.vscode
+.idea
+
+*.js.map
+*.ts
+*.md
+.git*
+local.settings.json
+test
+
+node_modules/
+dev/
+noisyneighbour/

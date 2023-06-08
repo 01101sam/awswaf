@@ -1,0 +1,37 @@
+<!--This is a placeholder for clear view of the challenge page.-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Human Verification</title>
+    <style>
+        body {
+            font-family: "Arial", serif;
+        }
+    </style>
+    <script type="text/javascript">
+        window.awsWafCookieDomainList = [];
+    </script>
+    <script src="challenge.js"></script>
+    <script src="captcha.js"></script>
+</head>
+<body>
+<div id="captcha-container"></div>
+<script type="text/javascript">
+    window.addEventListener("load", function () {
+        const container = document.querySelector("#captcha-container");
+        CaptchaScript.renderCaptcha(container, async (voucher) => {
+                await ChallengeScript.submitCaptcha(voucher);
+                window.location.reload();
+            },
+            {
+                "key": "AQIDAHjcYu/GjX+QlghicBgQ/7bFaQZ+m5FKCMDnO+vTbNg96AEv/LLhjBwtsHABIDgNb1v7AAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMVe22/4mDdeSmUGbHAgEQgDt9UvNpGiBuLb+INHP/ehNigPppIQxP9lDI+6rgmiuXndCepwjHEKLnoZ2kK1ZwwjeHbLCAx1rW15vFRQ==",
+                "iv": "CgAALB4Wl5AAAAd6",
+                "context": "hxoSYFd6dJnfn1vqatPN+ZuK9rjsWaZ5ILGHkwBfKvsp4GKnq/97Whslsu07fy8I827WlEx4yPJql4oCiv4PUm0xP8+2aYXjEuaXA3CtF8JS7IiIPLbhIsq/W1qIYkfVdGMtN5iw3Iyt30M2bqtCv4uKqGEKEnwZa/bA7QbhcWgZ5tggJwzhPMA4PrRRgJnEEwDODZ3Zd3AFIsP13kWZZD4lhGc7hHzHZxrJNa9C05Pv7gLUK3RZuV4fZlpCinKyQu/12SpFRuyZPhmxp3If6NLE23FM5Z+JIHZ0rU7qv/C0n3EBOV0jASD+9KcnBX4z6Y0ap3H3xCfhpuixMbl+/e6OeZKJoI0="
+            }
+        );
+    });
+</script>
+</body>
+</html>

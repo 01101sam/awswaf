@@ -1,0 +1,103 @@
+# Request & Response
+
+> Note: The following headers were automatically applied to all requests:
+
+```http request
+Origin: https://my.freenom.com
+Referer: https://my.freenom.com/
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36
+```
+
+## Initial
+
+### Getting inputs
+
+```http request
+GET https://f6f157a0c4af.5e4b41f9.eu-west-1.token.awswaf.com/f6f157a0c4af/2a5119942dc9/59075d3bccee/inputs?
+    client=browser HTTP/1.1
+
+{
+    "challenge": {
+        "input": "<Base64 encoded>",
+        "hmac": "<Base64 formatted>",
+        "region": "eu-west-1"
+    },
+    "challenge_type": "h7b0c470f0cfe3a80a9e26526ad185f484f6817d0832712a4a37a908786a6a67f",
+    "difficulty": 8
+}
+```
+
+| Field            | Note                                                                                 |
+|------------------|--------------------------------------------------------------------------------------|
+| challenge.input  | Base64 encoded inputs, explained in (Inside of input)[#Inside-of-input]              |
+| challenge.hmac   | HMAC of the input, using the secret key                                              |
+| challenge.region | Region of the challenge (Fixed)                                                      |
+| challenge_type   | Challenge type, fixed value (currently)                                              |
+| difficulty       | Difficulty of the challenge, changed every time (Observed: 8, 4, 3 (? Only in code)) |
+
+#### Inside of input
+
+> Decoded
+
+```json5
+{
+  "version": 1,
+  "ubid": "<uuid4>",
+  "attempt_id": "<uuid4>",
+  "create_time": "2023-06-03T06:57:49.306633452Z",
+  // 8, 4, 3 (?)
+  "difficulty": 4,
+  "challenge_type": "HashcashScrypt"
+}
+```
+
+### Browser verification
+
+```http request
+POST https://f6f157a0c4af.5e4b41f9.eu-west-1.token.awswaf.com/f6f157a0c4af/2a5119942dc9/59075d3bccee/verify HTTP/1.1
+Content-Type: text/plain; charset=UTF-8
+
+{
+    "challenge": {
+        "input": "<Base64 encoded>",
+        "hmac": "<Base64 formatted>",
+        "region": "eu-west-1"
+    },
+    "solution": "??",
+    "signals": [
+        {
+            "name": "KramerAndRio",
+            "value": {
+                "Present": "BZ2RCjO/2Wt9tB0r::b645b59f750048ec30bb3863fd01229f::dfaff05446396a53bfacd9c34eb0ba989efa80d1b4fb61c2b98be30b666f28fbb5d7c30860779f784b493174e777cb47d05568b9b1379e127c99743645c20d3e693d8bccaf48f465bc39d795103683521b5b8a1832f9e176880291a982c9fe5e5c53cd57e344a493ac1e1a580d16afb7bb9c9c97d8f0cca6a59d759edad9f4ee744aa83b31a2fa4bdafa08876313972cb50a6a857872c91e0bd4ca9d6de59e0ae24c4724ae1a0b6104d37792947b6fba9444332d0fc65e13d0fd8aa20b6bb8e829c54e48508a83baabb377fa7f00f8047bc569c15d13344e072818273618cfec45e23aaaf867463e4ec0b1e073684968c1d16310a17323ce3da731b72fabab267f3a15416fb84f45405a5331cb72237b8c771a50bd9fc59533cbb97eed75c76f576c1f1bfd6d506d0538224dcb9392a37b226f998e09abd934979daa76340d4b64b8af8ddd7ac80485c3bd7df90ecebc963b129e2d12596c6fa963d2764557270ebbd6ffad811b8cbe78dc8facab1a8c42c6c2e3492d5206248a2e69f4bfb71d57e37794e47545f60e4828567bb2fca928bf22daf91c9a40b121d2be052261c9bb223cae27b9fe178f6d5f970254d397c98141b0d16419e17f201087bd2ebc113fac91700f0c227104d0b523176e9265e818a7f9dba71a6fc4058bc5f39d928bfd6d2d12bd650bd8e658e8d92f1c4fd2c6d869ecaf1bf6121aca36ffeec3c9aa45c47c7d432f1c9d05c9799bfb9f1d5addec691f36c25b4df7da04e647e4d3585d3eab462207e6f00211ede5f8f99957512d05fe76ed70b600aa715d4e56db624f0f504de49491f4b16cea7d4d05c1e1dedb8165f6c4ee92767c2ce977289ce9ec48ef95f84544a502b42c5dfd5d85f4b9504539789706d5e694c42f86691ceac46045395e4b06f6f85dbeac45c60253b71574361d0a7674ca8e2c21f558f0fc1eedb40abb2643b9f4a71de2efe6c5700a3b562ede8bce3579ac892abffcfde9ff02605db69ce8fb4abf3c0845c5949e53cfcabbef1839173f8f22faf479506714f44b090325b3e4e7b8cfc8591725ace01da5d090d491812eb26501891f7aa9f2e46817ae848f46d2eca19ce7ddde680125ffe560740fd50c64c81a2a9d998c685e5e4bf5276d5051fd67125b8ed1ddc8e4424d4d7638e8405c170561280834d4854a8c42cdc3043c89756829841357afd3cb25c0a530c797903416ad0509f12e2c9c2be7af56ddcad7a0e757eb97c4c5ecb8a6d5b00b49c0244b91e4a0fa322c20ffe7b1a457acbad2ec054f079d92a581b78a55c5a109afa60948cd4961b9170105b359e7540c009de18edb590410b9578eae75721d4b4194a9ef96d1b015349013a3227931c8df9ec17db685303d890a75ae6a9462f5d746d2983c19a4952ea2f0a23960001530f523fdb4cb6d627398d449c883008d15689cbc6b76743791e6eedf1c00b877e98269fdca23453bc0fcd2ddb2536783f897d1a3c8fc75c6e8eb27937f210ecc1d5593033492772f9afb1fcd14eb9bc2926a15782327c21c462be23c6612aa82dd34a740cd34e0a47f89161ef3372bb8d5e0fd7245a8b11daea99d75d1e64e692f3091c570c8e41d38d63771a004f64b585ab0e1734290e5e564c525a8c6335a2b1f99338543ee60d25e433f95cc6ed5b7ef393d0e168c342d342961fbd47e308059bb9a84adedd83b171d7797e95c9314b7aebaf0e1d53bebe6c676ed1642eff9e3f79615ed30befd0eb90ff2917192b5fd8c2b62f0159eec35b6b69977f209c40deea0bf5e479b2a710cac085a505fd977bca84d6cd0fd913e06eb9655f8e39d0e89690fab94564c1e4c9ffd5a903e0a789cd13e89db14be2f48cddb8c00c8f709b243c7269903ecc5bb6c0021b0dc3dfde2fe9f0a777620f5db45f02828834078105e4a6974d0c5d21c6edd9755530e5de3a8b9e08afd31628ba400ec306c8c633113944981e191fdc599cee8bab28a8d98606989b201decd8c1868525d5fa3cfe8dcbe132b17809940267cf51b3dd8a75badac652f7091940ed76507d4de011a15f1642361dd7f506dc8a6af3de374aa69eeadacfef92f12170498cf1555e78887a5852d66bb16e15ca9a8cfffef3be5f53ac5cfb7a90b1ac6f9b19ab2e8847487e25a1ab519ea673da880fcb534e8391ec4fb343d05e31b506f2093f2aa4592085463aeab83a703743759066186a72d73b083276b9fb62481592e2b75c6505c71badc83a9df355d473558a82d59ae52a040b6d887848daa7ed5f33d3183e84d2232d174931d7455e20dd880c90257e4e586e9c4d4948ce11ee3f3316220af930a27e2635990fd639eb2992569fb2f9a99285c49cb5bc5933b3f0b2ee26845a74730a419c719401cd4d830c1db9b42e8bd6fab48f0aca9aed3c5fe326d78e98231a7b995fb77c3d944f4135c892810f66c8a4f6cdbec83d4119407037dc275c4b3a6860d1831c25dd25acef7f81c4dbd1bac4401e9de6af25bdec11cb32ec6747d851b3fd4a0dc2bc5398a74bc7fa09d8563d6ed2c73281ff29e1c360c2dbe4345b35668a4ddcfa655f3187678573b0f5001a3f33de4aa00992a96e8bf26f095baeee7d2ec4b689c5909aa601097712ac9e3e01fadb3c348fe408706c1be81f248e431da44397b05597655f09c3b8ed2b43c4b9aaf97efd19be57201ab39e7bb7a81c5eb1254af8ffdacf2616a24019bcecbe302e2c175f677109f307cff665963742d94878d2ed8aa45f0577caf8d88f287a311edb13af2a35813464bd1bc41b5844a2aa81e9665ae93481ec92d17f03c60a51b82b539b35fdd357e1c20844284c2ae166e73dde070b0593cffab17001ac38a172baff293301f5ff40573589f7024e650bad418192bb0418ad04bfbba4974a4f2d0486082cfe69a06045b8082877a1eda7738a6bb28f2bdda0ea5a31abfda422f48ac5d1af2201b900325c9f5595699ce82e06bdd9773ef90b254c6478661a73fe8c102563d3706dfa258e7b2c55e29ec7bedf58781d181101456f334ce6c4eba8f0f980868cb1398b85c1dced3d24298bb6d0e9da86ea5e955688993b49d03197ea139bee0baae66d32a889e30a731097feae7dd68738583ded78066cfa85013a09b0b22e5e275517851c7629b39788633941cc4729905add23edb757963117b3a2108e190c070ae43c87a6fbd9de94a83577ef77622a03adab4e32954a08960c9dd62046bea8ab746be0c03f9d3771a58407f86338e33009e1b1141b8a6c69901c7ba633312ba91da5d5ebfa05fa428b595e26c7a6f7671b1351ab0e360f27285cd01e4bfe0807fb6a6a872312834bd09b13cff2e8adbcbee74a51fc886b6e2caa53de57ecdeece20f30da10f695786354276d321cee1af76b34d191e3091dc56029a73569a6861604a1fc7a683764770ae4813704e925919f3f52ae03d4ee620958987508ba04d33c5be765417d84cd82b2b8129f808b0f9c8ee3abb8ef2557c64d0195b7b6d34fde1660204aaaca269d4e6c1360dde1daa2719b23d6416eb5b5ab76428480203f014aad231cdb94738c7fcc6401fdafd5f45c19b4c3018cc0e3d54db8f836d0434a90ec513879ad1f14f2e5ae0757ff5e1fa1bb6207d0feee420fbd316200b920e4e8fb60ed3a75f49fc3d6344b16486f2c295f81e49c1d5170a3fb818f85fd89074ba303c05a3cc543a976f319d081f2e9609dd5654b367b6d128319980040bc349466480828924a2a3677be3ebe700c9a11c73828d80a1d44966b05ecd1a4ca70b7623280326737bd0582cc6a45b2b10923fea027c0504794a6063541a3b24337d925b6fbb3d8a79432af95a9ca9c6f0429485bc8c2bd29dec24b7aedcaed8db8f3cafacd410758a288dc153bdb115739394385c259f21c2ddb647eba6c3f120684d3f3684b94eebeb1f4b994d9f2f23676d664f04a4e0390ecb351241b8ace22fabc38d1ef602cd0aba015cf205ae6ec7968e9c99a388bb3685c1f450ec62cc2ba99f8062124963b6ae3ff7b31384356a40f91695b22db25ae61aca5206fedf1cc25f7d7dda3e51553491cb24f1d6ddb0447c66551ffff5f455324a3e1029ff0cfd73425e69e276d32802d6044d4aaa7bbab267dc76660bd0b6a4c6c7bff2b8df68b66d92fb6701779db61e6f7f2f6508276a3f638417f594809f19409f54a40bebb0a9bb84eab5e9a27d1c509a36d79c3d6754d0d537e5b41da52d7e961d66a513b2723cebbb119ce682bef1b65cb4005e4445fbba153792147d8eac263238e8049f3439d88300b35ed8fb1989c7c84ae88775f92590bf352f216b529cc289fffb5a68e4407efd0551448e0d33b8dd48b1e224301077c655dff077eb2c432e6de6f7b6483501b03654befdad36ac6cd2c4e7d18cb690c1a848c468cc4ec4478a088d651a03c1c636390807e09f5c0e86926ae1b7c4515fcc9c69c39a7e5686cbc8f4a776c421c2767a4caebb35781bd2003f8485b41af2cb0fb95213efaf5e86228e9cf9d5235dfa4cd92b7b1db22ebb48bbb91af7923bf3108ba8ff0e5275598529da6483d8c23d1b7b07c67d5507a5d76fc1fbc9c0971c40b38174e96f2daa382073041dabe7f93921151dd1b1468b541f3d0750eef609c713f8468125f244365c264ebb54646358d2bfc62fd462f56d2dd4fcfe5b2b15089275ecf741e9823bf982f7e02d4a871b5d7993b7800aa87e88c434c53b81cbabf808724aa91b618fd2412ad6c6f4940accd5bee87f71b4c35a94fffbb423528990240df524"
+            }
+        }
+    ],
+    "checksum": "<HEX, length: 8>",
+    "existing_token": null,
+    "client": "Browser",
+    "domain": "my.freenom.com",
+    "metrics": [
+        {
+            "name": "2",
+            "value": 1807.0999999642372,
+            "unit": "2"
+        },
+        ...
+    ]
+}
+
+{
+    "token": "07ca41ae-dc3b-4336-a26f-3070d03834ae:CgoAnWUxII8AAAAA:x3Fr0eR6EQw9Y00Yj3R3JuDuCAOEZA/9JqVrxMajvBxQQO/J6Ekcdb6J7qqkVH/l9krJNaCWR/lA2qGG86OBfxBqiJBrw752WvzuRGGtI088OlU8O3w11X3MMeIxmWqDcEzz0k6AAFPfrk8UH3DnAvNR2lHzuZS6Sk7ZxILQ3kBEoiqz/t12aQ/1Eawrg7cSEA==",
+    "inputs": null
+}
+```
+
+| Field     | Note                                                      |
+|-----------|-----------------------------------------------------------|
+| challenge | Asis, refer to [Getting inputs](#Getting-inputs) section. |
+| client    | The client to use, `Browser` is fixed                     |
+| domain    | The domain of the website                                 |
+
+
+
+[//]: # (TODO - Unfinished)
