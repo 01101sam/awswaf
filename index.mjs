@@ -41,7 +41,7 @@ app.http('HttpTrigger', {
             context.log("Verifying solution...");
             [result, verify] = await awsWAF.verifySolution(problem, solution);
             if (!result) return response(500, verify);
-            if (!verify.success) {
+            if (!verify.success || !verify.captcha_voucher) {
                 context.warn("Captcha verification failed, retrying...");
                 problem = verify.problem;
             } else break;
