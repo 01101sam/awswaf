@@ -87,10 +87,23 @@ class AWSVoiceCaptcha {
         } catch (e) {
             return error("AZ_STT_REQ_FAILED", `Failed to request to Azure STT`, e.stack);
         }
-        if (resp.status !== 200) return error("INVALID_HTTP_STATUS", `Invalid HTTP status code when requesting Azure STT (HTTP Status: ${resp.status})`);
-        const json = await resp.json();
-        if (json['NBest'][0]['Confidence'] <= 0.69) console.debug("[Azure STT] Warning: Low Confidence");
-        return [true, json['NBest'][0]['ITN'].split(" ").slice(-2, -1)[0]];
+        let json;
+        try {
+            json = await resp.json();
+        } catch (e) {
+            return error("AZ_STT_JSON_FAILED", `Failed to parse JSON when requesting to Azure STT`, await resp.text());
+        }
+        if (resp.status !== 200)
+            return error("INVALID_HTTP_STATUS", `Invalid HTTP status code when requesting Azure STT (HTTP Status: ${resp.status})`, json || await resp.text());
+        // if (json['NBest'][0]['Confidence'] <= 0.69) console.debug("[Azure STT] Warning: Low Confidence");
+        let result = json['DisplayText']
+            .toLowerCase()
+            .replaceAll(",", "")
+            .replaceAll(".", "")
+            .replace(/^type one of the two following words spoken by me/, "")
+            .replaceAll(/\s{2,}/g, "");
+        if (!result.length) return error("AUDIO_ANSWER_EMPTY", "AWS Captcha audio answer is empty", json);
+        return [true, result.split(" ").slice(-2, -1)[0]];
     }
 
     /**
@@ -115,12 +128,12 @@ class AWSVoiceCaptcha {
         try {
             [result, audioGuess] = await this._getAudioAnswer(audioBin);
             if (!result) {
-                console.debug(`Failed to get AWS Captcha audio answer: ${audioGuess['msg']}${audioGuess.error ? `\nStack: ${audioGuess.stack}` : ""}`);
+                console.debug(`Failed to get AWS Captcha audio answer: ${audioGuess['msg']}${audioGuess.error ? JSON.stringify(audioGuess, null, 4) : ""}`);
             }
         } catch (e) {
             return error("AUDIO_ANSWER_FAILED", "AWS Captcha audio guess failed", e.stack);
         }
-        return [true, audioGuess];
+        return [result, audioGuess];
     }
 }
 
@@ -562,7 +575,7 @@ export class AWSWebApplicationFirewall {
     async solveProblem(problem) {
         let result, data;
         // Too much time-wasting on visual, let's skip
-        switch (problem['problem_type']) {
+        switch (problem['problem_type'].split("-")[0]) {
             // case "toycarcity":  // Visual
             // Point the car destination
             // {x: ?, y: ?}
